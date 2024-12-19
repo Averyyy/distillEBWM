@@ -10,7 +10,8 @@ import numpy as np
 import json
 from tqdm import tqdm
 
-from transformers import mpu
+# from transformers import mpu
+# from megatron import mpu
 
 from arguments import get_args
 
@@ -36,7 +37,7 @@ def setup_model(args, ds_config, device):
         optimizer=optimizer,
         args=args,
         lr_scheduler=lr_scheduler,
-        mpu=mpu if args.model_parallel else None,
+        # mpu=mpu if args.model_parallel else None,
         config_params=ds_config
     )
     
@@ -56,14 +57,14 @@ def generate(args, tokenizer, model, dataset, device):
     
     collate_fn = dataset.collate
 
-    if args.model_parallel:
-        dp_world_size = mpu.get_data_parallel_world_size()
-        dp_rank = mpu.get_data_parallel_rank()
-        dp_group = mpu.get_data_parallel_group()
-    else:
-        dp_world_size = dist.get_world_size()
-        dp_rank = dist.get_rank()
-        dp_group = None
+    # if args.model_parallel:
+    #     dp_world_size = mpu.get_data_parallel_world_size()
+    #     dp_rank = mpu.get_data_parallel_rank()
+    #     dp_group = mpu.get_data_parallel_group()
+    # else:
+    dp_world_size = dist.get_world_size()
+    dp_rank = dist.get_rank()
+    dp_group = None
 
     sampler = DistributedSampler(dataset, shuffle=False, drop_last=False, rank=dp_rank, num_replicas=dp_world_size)
     dataloader = DataLoader(
