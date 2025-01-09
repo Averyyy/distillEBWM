@@ -13,21 +13,23 @@ DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE \
                   --master_port $MASTER_PORT"
 
 # model
-BASE_PATH=${1-"/home/MiniLLM"}
-CKPT_NAME="gpt2-small"
-CKPT="${BASE_PATH}/checkpoints/${CKPT_NAME}/"
-# CKPT="gpt2" # download automatically
+BASE_PATH="/work/hdd/bdta/aqian1/distillEBWM"
+CKPT_NAME="gpt2-base"
+CKPT="${BASE_PATH}/checkpoints/${CKPT_NAME}"
+TEACHER_CKPT_NAME="gpt2-large-sft"
+TEACHER_CKPT="${BASE_PATH}/results/gpt2/sft/${TEACHER_CKPT_NAME}"
 # data
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
+LM_DATA_DIR="${BASE_PATH}/processed_data/openwebtext/gpt2/512/10M/"
 # hp
 BATCH_SIZE=8
 LR=0.0005
 GRAD_ACC=1
-EVAL_BATCH_SIZE=32
+EVAL_BATCH_SIZE=16
 # length
 MAX_LENGTH=512
 # runtime
-SAVE_PATH="${BASE_PATH}/results/gpt2/train/sft"
+SAVE_PATH="${BASE_PATH}/results/gpt2/train/distill_0.1B_0.7B_2"
 # seed
 SEED=10
 
@@ -36,12 +38,15 @@ OPTS=""
 # model
 OPTS+=" --base-path ${BASE_PATH}"
 OPTS+=" --model-path ${CKPT}"
+OPTS+=" --teacher-model-path ${TEACHER_CKPT}"
 OPTS+=" --ckpt-name ${CKPT_NAME}"
+OPTS+=" --teacher-ckpt-name ${TEACHER_CKPT_NAME}"
+OPTS+=" --teacher-model-fp16"
 OPTS+=" --n-gpu ${GPUS_PER_NODE}"
-# OPTS+=" --gradient-checkpointing"
 # data
 OPTS+=" --data-dir ${DATA_DIR}"
-OPTS+=" --num-workers 0"
+OPTS+=" --lm-data-dir ${LM_DATA_DIR}"
+OPTS+=" --num-workers 4"
 OPTS+=" --dev-num 1000"
 # hp
 OPTS+=" --lr ${LR}"
@@ -53,6 +58,7 @@ OPTS+=" --lr-decay-style cosine"
 OPTS+=" --weight-decay 1e-2"
 OPTS+=" --clip-grad 1.0"
 OPTS+=" --epochs 20"
+OPTS+=" --kd-ratio 1.0"
 # length
 OPTS+=" --max-length ${MAX_LENGTH}"
 OPTS+=" --max-prompt-length 256"
@@ -71,16 +77,23 @@ OPTS+=" --seed ${SEED}"
 OPTS+=" --deepspeed"
 OPTS+=" --deepspeed_config ${BASE_PATH}/configs/deepspeed/ds_config.json"
 # type
-OPTS+=" --type lm"
+OPTS+=" --type adaptive-sfkl"
 # gen
 OPTS+=" --do-sample"
 OPTS+=" --top-k 0"
 OPTS+=" --top-p 1.0"
 OPTS+=" --temperature 1.0"
+# distillm
+OPTS+=" --student-gen"
+OPTS+=" --gen-num-beams 1"
+OPTS+=" --gen-top-p 1.0"
+OPTS+=" --init-threshold 0.0"
+OPTS+=" --loss-eps 0.1"
+OPTS+=" --capacity 1000"
 
 
 export NCCL_DEBUG=""
-export WANDB_DISABLED=True
+export WANDB_DISABLED=False
 export TF_CPP_MIN_LOG_LEVEL=3
 export PYTHONPATH=${BASE_PATH}
 CMD="torchrun ${DISTRIBUTED_ARGS} ${BASE_PATH}/finetune.py ${OPTS} $@"
@@ -88,4 +101,4 @@ CMD="torchrun ${DISTRIBUTED_ARGS} ${BASE_PATH}/finetune.py ${OPTS} $@"
 echo ${CMD}
 echo "PYTHONPATH=${PYTHONPATH}"
 mkdir -p ${SAVE_PATH}
-${CMD}
+CODE_BASE=HF ${CMD}

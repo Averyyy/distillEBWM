@@ -1,4 +1,6 @@
 BASE_PATH=${1}
+# BASE_PATH=/work/hdd/bdta/aqian1/distillEBWM
+
 
 export TF_CPP_MIN_LOG_LEVEL=3
 

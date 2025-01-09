@@ -2,7 +2,7 @@
     "train_micro_batch_size_per_gpu": 1,
     "gradient_accumulation_steps": 1,
     "zero_optimization": {
-        "stage": 1
+        "stage": 2
     },
     "zero_allow_untested_optimizer": true,
     "fp16": {
@@ -12,5 +12,6 @@
         "loss_scale_window": 2000,
         "hysteresis": 4
     },
+    "gradient_clipping": 1.0,
     "wall_clock_breakdown": false
 }

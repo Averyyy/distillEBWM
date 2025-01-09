@@ -2,12 +2,17 @@ import datasets
 import os
 import re
 
+# 指定绝对路径
+BASE_DIR = "/work/hdd/bdta/aqian1/distillEBWM"
+OUTPUT_DIR = os.path.join(BASE_DIR, "data/openwebtext")
+
 dataset = datasets.load_dataset('openwebtext', split='train')
 
-os.makedirs("data/openwebtext", exist_ok=True)
+
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 num = 0
-with open("data/openwebtext/data.txt", "w") as f:
+with open(os.path.join(OUTPUT_DIR, "data.txt"), "w") as f:
     for data in dataset:
         f.write(re.sub(r"\n+", "<@x(x!>", data['text']) + "\n")
         num += 1
