@@ -66,7 +66,7 @@ class EBWM_NLP(L.LightningModule):
                 predicted_tokens = predicted_tokens.detach().requires_grad_().reshape(batch_size, seq_length, self.vocab_size) # B, S, V
 
                 if self.hparams.normalize_initial_condition:
-                    predicted_tokens = self.softmax(predicted_tokens)
+                    predicted_tokens = self.softmax(predicted_tokens).to(self.vocab_to_embed.weight.dtype)
                     if self.hparams.vocab_to_embed_uses_prob_dist: # predicted_embeds is B, S, V; embed is V, D
                         predicted_embeddings = torch.matmul(predicted_tokens, self.embeddings.weight) #BS, S, D
                     else:

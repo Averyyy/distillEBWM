@@ -16,5 +16,4 @@ source activate test_setup
 cd /work/hdd/bdta/aqian1/distillEBWM
 
 # modify script name to run different tasks
-# bash scripts/gpt2/distillm/train_0.1B_0.7B.sh /work/hdd/bdta/aqian1/distillEBWM 4137 4
-bash scripts/ebwm/distillm/train_base_large.sh 4137 4
+bash scripts/ebwm/distillm/train_ebwm.sh

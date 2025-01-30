@@ -1,10 +1,10 @@
-#! /bin/bash
+#!/bin/bash
 
 MASTER_ADDR=localhost
-MASTER_PORT=${2-2012}
+MASTER_PORT=29300
 NNODES=1
 NODE_RANK=0
-GPUS_PER_NODE=${3-16}
+GPUS_PER_NODE=1   # or however many GPUs you have
 
 DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE \
                   --nnodes $NNODES \
@@ -12,45 +12,44 @@ DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE \
                   --master_addr $MASTER_ADDR \
                   --master_port $MASTER_PORT"
 
-# model
-BASE_PATH="/work/hdd/bdta/aqian1/distillEBWM"
-CKPT_NAME="gpt2-base"
-CKPT="${BASE_PATH}/results/gpt2/train/init/${CKPT_NAME}"
-# CKPT="${BASE_PATH}/checkpoints/gpt2-small"
-TEACHER_CKPT_NAME="large-sft"
-# TEACHER_CKPT_NAME="gpt2-medium"
-TEACHER_CKPT="${BASE_PATH}/results/gpt2/train/sft/gpt2-large/"
-# TEACHER_CKPT="${BASE_PATH}/checkpoints/gpt2-medium"
-# data
-DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
-LM_DATA_DIR="${BASE_PATH}/processed_data/openwebtext/gpt2/512/10M/"
-# hp
-# BATCH_SIZE=8
+########################
+# Path config
+########################
+BASE_PATH="/work/hdd/bdta/aqian1/distillEBWM"   # change to your path
+STUDENT_CKPT="${BASE_PATH}/checkpoints/ebwm-base"    # the EBWM checkpoint or empty
+TEACHER_CKPT="${BASE_PATH}/results/gpt2/sft/gpt2-large"
+DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2"
+LM_DATA_DIR="${BASE_PATH}/processed_data/openwebtext/gpt2/512/10M"
+
+########################
+# Hyperparams
+########################
 BATCH_SIZE=2
 LR=0.0005
 GRAD_ACC=1
-EVAL_BATCH_SIZE=16
-# length
+EVAL_BATCH_SIZE=2
 MAX_LENGTH=512
-# runtime
-SAVE_PATH="${BASE_PATH}/results/gpt2/train/distill_0.1B_0.7B_final2"
-# seed
-SEED=10
+EPOCHS=5
+SAVE_PATH="${BASE_PATH}/results/ebwm/train/distill_base_large"
+SEED=42
 
-
+########################
+# Additional arguments
+########################
 OPTS=""
-# model
 OPTS+=" --base-path ${BASE_PATH}"
-OPTS+=" --model-path ${CKPT}"
+# The EBWM student model location
+OPTS+=" --ebwm-model-path ${STUDENT_CKPT}/ebwm_student.ckpt"  
+# or skip if you want to train from scratch
 OPTS+=" --teacher-model-path ${TEACHER_CKPT}"
-OPTS+=" --ckpt-name ${CKPT_NAME}"
-OPTS+=" --teacher-ckpt-name ${TEACHER_CKPT_NAME}"
+OPTS+=" --ckpt-name ebwm-base"
+OPTS+=" --teacher-ckpt-name gpt2-large"
 OPTS+=" --teacher-model-fp16"
 OPTS+=" --n-gpu ${GPUS_PER_NODE}"
 # data
 OPTS+=" --data-dir ${DATA_DIR}"
 OPTS+=" --lm-data-dir ${LM_DATA_DIR}"
-OPTS+=" --num-workers 4"
+OPTS+=" --num-workers 1"
 OPTS+=" --dev-num 1000"
 # hp
 OPTS+=" --lr ${LR}"
@@ -61,7 +60,7 @@ OPTS+=" --warmup-iters 0"
 OPTS+=" --lr-decay-style cosine"
 OPTS+=" --weight-decay 1e-2"
 OPTS+=" --clip-grad 1.0"
-OPTS+=" --epochs 5"
+OPTS+=" --epochs ${EPOCHS}"
 OPTS+=" --kd-ratio 1.0"
 # length
 OPTS+=" --max-length ${MAX_LENGTH}"
@@ -72,37 +71,30 @@ OPTS+=" --do-valid"
 OPTS+=" --eval-gen"
 OPTS+=" --save-interval -1"
 OPTS+=" --eval-interval -1"
-OPTS+=" --log-interval 4"
+OPTS+=" --log-interval 5"
 OPTS+=" --mid-log-num -1"
 OPTS+=" --save ${SAVE_PATH}"
-# seed
 OPTS+=" --seed ${SEED}"
 # deepspeed
 OPTS+=" --deepspeed"
 OPTS+=" --deepspeed_config ${BASE_PATH}/configs/deepspeed/ds_config.json"
-# type
+# type of distill
 OPTS+=" --type adaptive-sfkl"
-# gen
+OPTS+=" --loss-eps 0.1"
+OPTS+=" --capacity 1000"
+# generation
 OPTS+=" --do-sample"
 OPTS+=" --top-k 0"
 OPTS+=" --top-p 1.0"
 OPTS+=" --temperature 1.0"
-# distillm
+# Distillm Student generation
 OPTS+=" --student-gen"
 OPTS+=" --gen-num-beams 1"
 OPTS+=" --gen-top-p 1.0"
 OPTS+=" --init-threshold 0.0"
-OPTS+=" --loss-eps 0.1"
-OPTS+=" --capacity 1000"
 
-
-export NCCL_DEBUG=""
-export WANDB_DISABLED=True
-export TF_CPP_MIN_LOG_LEVEL=3
-export PYTHONPATH=${BASE_PATH}
-CMD="torchrun ${DISTRIBUTED_ARGS} ${BASE_PATH}/finetune.py ${OPTS} $@"
+CMD="torchrun ${DISTRIBUTED_ARGS} ${BASE_PATH}/finetune_ebwm.py ${OPTS} $@"
 
 echo ${CMD}
-echo "PYTHONPATH=${PYTHONPATH}"
 mkdir -p ${SAVE_PATH}
 CODE_BASE=HF ${CMD}

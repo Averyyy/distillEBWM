@@ -1,0 +1,284 @@
+_wandb:
+    value:
+        cli_version: 0.19.5
+        m: []
+        python_version: 3.10.0
+        t:
+            "1":
+                - 1
+                - 9
+                - 11
+                - 41
+                - 49
+                - 55
+                - 71
+                - 98
+                - 103
+            "2":
+                - 1
+                - 9
+                - 11
+                - 41
+                - 49
+                - 55
+                - 71
+                - 98
+                - 103
+            "3":
+                - 13
+                - 16
+                - 23
+                - 55
+            "4": 3.10.0
+            "5": 0.19.5
+            "6": 4.47.1
+            "8":
+                - 5
+            "12": 0.19.5
+            "13": linux-x86_64
+attn_dtype:
+    value: null
+base_path:
+    value: null
+batch_size:
+    value: 1
+bin_data:
+    value: false
+capacity:
+    value: 1000
+chunk_size:
+    value: null
+ckpt_name:
+    value: null
+clip_grad:
+    value: 1
+cliprange:
+    value: 0.2
+cliprange_reward:
+    value: 1
+data_dir:
+    value: /work/hdd/bdta/aqian1/distillEBWM/processed_data/dolly/full/gpt2/
+data_names:
+    value: null
+data_process_workers:
+    value: -1
+deepscale:
+    value: false
+deepscale_config:
+    value: null
+deepspeed:
+    value: true
+deepspeed_config:
+    value: ./configs/deepspeed/ds_config.json
+dev_num:
+    value: -1
+dev_ratio:
+    value: 1
+do_eval:
+    value: false
+do_sample:
+    value: false
+do_train:
+    value: false
+do_valid:
+    value: false
+dropout_path_rate:
+    value: null
+eb_sample_times:
+    value: 3
+epochs:
+    value: 5
+eval_batch_size:
+    value: 32
+eval_gen:
+    value: false
+eval_interval:
+    value: 1000
+eval_ppl:
+    value: false
+eval_rw:
+    value: false
+force_process:
+    value: false
+force_process_demo:
+    value: false
+fp32:
+    value: false
+gamma:
+    value: 0.95
+gen_num:
+    value: -1
+gen_num_beams:
+    value: 2
+gen_top_p:
+    value: 1
+gradient_accumulation_steps:
+    value: 4
+gradient_checkpointing:
+    value: false
+init_threshold:
+    value: 0
+json_data:
+    value: false
+kd_ratio:
+    value: null
+length_norm:
+    value: false
+lm_coef:
+    value: 1
+lm_data_dir:
+    value: null
+load:
+    value: null
+local_rank:
+    value: 0
+log_interval:
+    value: 10
+loss_eps:
+    value: 0.1
+loss_scale:
+    value: 65536
+lr:
+    value: 5e-05
+lr_decay_iters:
+    value: null
+lr_decay_style:
+    value: noam
+lr_min:
+    value: 1e-07
+max_length:
+    value: 1024
+max_prompt_length:
+    value: 512
+mid_log_num:
+    value: 4
+min_prompt_length:
+    value: 128
+mixed_alpha:
+    value: 0.5
+model_ckpt:
+    value: null
+model_parallel:
+    value: false
+model_parallel_size:
+    value: null
+model_path:
+    value: gpt2
+model_type:
+    value: gpt2
+n_gpu:
+    value: 1
+n_nodes:
+    value: 1
+no_repeat_ngram_size:
+    value: 6
+no_value:
+    value: false
+num_beams:
+    value: 1
+num_rollouts:
+    value: 256
+num_rollouts_per_device:
+    value: null
+num_workers:
+    value: 1
+only_prompt:
+    value: false
+peft:
+    value: null
+peft_lora_alpha:
+    value: 64
+peft_lora_dropout:
+    value: 0.1
+peft_lora_r:
+    value: 16
+peft_name:
+    value: null
+peft_path:
+    value: null
+ppo_epochs:
+    value: null
+processed_data_dir:
+    value: null
+prompt_data_dir:
+    value: null
+prompt_type:
+    value: null
+rank:
+    value: 0
+repetition_penalty:
+    value: null
+replay_ratio:
+    value: decreasing
+reward_scaling:
+    value: null
+save:
+    value: /work/hdd/bdta/aqian1/distillEBWM/results/ebwm/train/distill_base_large
+save_additional_suffix:
+    value: ""
+save_interval:
+    value: 1000
+save_rollout:
+    value: false
+scheduler_name:
+    value: constant_trm
+seed:
+    value: 1234
+seed_data:
+    value: 42
+seed_lm:
+    value: 7
+seed_order:
+    value: 42
+seed_ppo:
+    value: 42
+single_step_reg:
+    value: false
+skew_alpha:
+    value: 0.1
+student_gen:
+    value: false
+teacher_ckpt_name:
+    value: gpt2-base-sft
+teacher_mixed_alpha:
+    value: null
+teacher_model_fp16:
+    value: false
+teacher_model_path:
+    value: /work/hdd/bdta/aqian1/distillEBWM/results/gpt2/sft/gpt2-base-sft
+teacher_model_type:
+    value: null
+teacher_peft_name:
+    value: null
+teacher_peft_path:
+    value: null
+temperature:
+    value: 1
+tokenizer:
+    value: null
+top_k:
+    value: 0
+top_p:
+    value: 1
+total_iters:
+    value: null
+train_iters_per_epoch:
+    value: -1
+train_num:
+    value: -1
+train_ratio:
+    value: 1
+training_epochs:
+    value: 10000
+txt_data:
+    value: false
+type:
+    value: null
+wandb:
+    value: true
+warmup_iters:
+    value: 0
+weight_decay:
+    value: 0.01
+world_size:
+    value: 1

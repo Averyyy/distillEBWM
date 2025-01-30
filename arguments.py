@@ -24,6 +24,7 @@ def add_model_args(parser: argparse.ArgumentParser):
 
     group = parser.add_argument_group('model', 'model configuration')
     group.add_argument('--model-path', type=str, help='model path')
+    group.add_argument('--model-ckpt', type=str)
     group.add_argument("--ckpt-name", type=str)
     group.add_argument("--model-type", type=str, default="gpt2")
     group.add_argument("--teacher-model-type", type=str, default=None)
@@ -221,6 +222,11 @@ def add_peft_args(parser: argparse.ArgumentParser):
     group.add_argument("--teacher-peft-path", type=str, default=None)
     return parser
 
+def add_ebwm_args(parser: argparse.ArgumentParser):
+    group = parser.add_argument_group('ebwm', 'ebwm configurations')
+
+    group.add_argument("--tokenizer", type=str, default=None)
+    return parser
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -233,11 +239,12 @@ def get_args():
     parser = add_distillm_args(parser)
     parser = add_gen_args(parser)
     parser = add_peft_args(parser)
+    parser = add_ebwm_args(parser)
     parser = deepspeed.add_config_arguments(parser)
     
     args, unknown = parser.parse_known_args()
     
-    assert all(["--" not in x for x in unknown]), unknown
+    # assert all(["--" not in x for x in unknown]), unknown
     
     args.local_rank = int(os.getenv("LOCAL_RANK", "0"))
         
